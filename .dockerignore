@@ -16,6 +16,6 @@ scripts
 test-system.js
 security-tests.js
 copy-image.js
-server
+# server - NEEDED FOR BACKEND BUILD!
 Yeni klasör
 
