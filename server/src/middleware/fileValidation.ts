@@ -125,6 +125,7 @@ export const validateUploadedFile = async (
           error: 'Polyglot file detected. File contains multiple file types.',
         });
         return;
+        }
       }
 
       // 3. Image dimension and content validation (basic check only in development)
