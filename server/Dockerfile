@@ -66,7 +66,8 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=40s --retries=3 \
 
 # Start both NGINX and Node.js
 # Start Node.js in background, then NGINX in foreground
-CMD ["/bin/sh", "-c", "mkdir -p /app/logs && node dist/server.js > /app/logs/node.log 2>&1 & sleep 3 && nginx -g 'daemon off;'"]
+# Use tail to keep container alive and show logs
+CMD ["/bin/sh", "-c", "mkdir -p /app/logs && node dist/server.js > /app/logs/node.log 2>&1 & sleep 5 && tail -f /app/logs/node.log & nginx -g 'daemon off;'"]
 
 
 
