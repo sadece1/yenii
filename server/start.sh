@@ -2,6 +2,11 @@
 
 # Start script for NGINX + Node.js backend
 
+# Debug: Print environment
+echo "🔍 Debug: Starting container..."
+echo "📁 PWD: $(pwd)"
+echo "📁 LS: $(ls -la /app/ | head -20)"
+
 # Function to handle shutdown
 cleanup() {
     echo "🛑 Shutting down..."
