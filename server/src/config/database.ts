@@ -29,18 +29,35 @@ const dbConfig: DatabaseConfig = {
   keepAliveInitialDelay: 0,
 };
 
+// Log database configuration (without password)
+console.log('📊 Database Configuration:');
+console.log(`  Host: ${dbConfig.host}`);
+console.log(`  Port: ${dbConfig.port}`);
+console.log(`  User: ${dbConfig.user}`);
+console.log(`  Database: ${dbConfig.database}`);
+
 // Create connection pool
 const pool = mysql.createPool(dbConfig);
 
-// Test connection
-export const testConnection = async (): Promise<void> => {
-  try {
-    const connection = await pool.getConnection();
-    console.log('✅ Database connection established successfully');
-    connection.release();
-  } catch (error) {
-    console.error('❌ Database connection failed:', error);
-    throw error;
+// Test connection with retry logic
+export const testConnection = async (maxRetries: number = 5, delay: number = 2000): Promise<void> => {
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      const connection = await pool.getConnection();
+      console.log('✅ Database connection established successfully');
+      connection.release();
+      return;
+    } catch (error: any) {
+      console.error(`❌ Database connection attempt ${attempt}/${maxRetries} failed:`, error.message);
+      
+      if (attempt === maxRetries) {
+        console.error('❌ Database connection failed after all retries');
+        throw error;
+      }
+      
+      console.log(`⏳ Retrying database connection in ${delay}ms...`);
+      await new Promise(resolve => setTimeout(resolve, delay));
+    }
   }
 };
 
