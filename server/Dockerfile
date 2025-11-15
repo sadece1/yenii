@@ -7,8 +7,10 @@ WORKDIR /app
 
 # Copy package files
 COPY package*.json ./
-COPY package-lock.json ./
 COPY tsconfig.json ./
+
+# Copy package-lock.json if it exists (optional)
+COPY package-lock.json* ./
 
 # Install dependencies
 RUN npm install
@@ -29,7 +31,7 @@ WORKDIR /app
 
 # Install only production dependencies
 COPY package*.json ./
-COPY package-lock.json ./
+COPY package-lock.json* ./
 RUN npm install --only=production
 
 # Copy built files from builder
