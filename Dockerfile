@@ -1,5 +1,5 @@
 # Stage 1: Build
-FROM node:18-alpine AS builder
+FROM node:20-alpine AS builder
 
 WORKDIR /app
 
@@ -9,7 +9,7 @@ COPY package*.json ./
 # Install dependencies
 RUN npm install
 
-# Copy source code
+# Copy all source files (including index.html)
 COPY . .
 
 # Build the application
