@@ -68,10 +68,7 @@ app.use(helmet({
   xContentTypeOptions: true,
   referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
   permittedCrossDomainPolicies: false,
-  expectCt: {
-    maxAge: 86400,
-    enforce: true,
-  },
+  // expectCt removed - not supported in current helmet version
 }));
 
 // CORS configuration with enhanced security
@@ -107,12 +104,12 @@ app.use(compression());
 // Body parsing middleware with size limits
 app.use(express.json({ 
   limit: process.env.MAX_JSON_SIZE || '1mb', // Reduced default for security
-  verify: (req, res, buf) => {
+  verify: (req: any, res: any, buf: Buffer) => {
     // Additional JSON validation can be added here
     try {
       JSON.parse(buf.toString());
     } catch (e) {
-      res.status(400).json({
+      (res as any).status(400).json({
         success: false,
         error: 'Invalid JSON format',
       });

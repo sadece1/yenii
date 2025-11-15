@@ -4,6 +4,9 @@ import { jwtConfig } from '../config/jwt';
 import { AuthRequest, UserPayload } from '../types';
 import logger from '../utils/logger';
 
+// Re-export AuthRequest for convenience
+export type { AuthRequest } from '../types';
+
 /**
  * JWT Authentication Middleware
  */
@@ -93,6 +96,11 @@ export const authorizeAdmin = (
 
   next();
 };
+
+/**
+ * Alias for authorizeAdmin (for backward compatibility)
+ */
+export const requireAdmin = authorizeAdmin;
 
 /**
  * Optional Authentication Middleware (doesn't fail if no token)

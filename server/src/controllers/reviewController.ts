@@ -343,3 +343,65 @@ export const reportReview = async (req: Request, res: Response) => {
     res.status(500).json({ message: 'Şikayet gönderilirken hata oluştu' });
   }
 };
+
+// Alias exports for routes compatibility
+export const getSingleReview = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const { type = 'all' } = req.query;
+  
+  try {
+    if (type === 'campsite' || type === 'all') {
+      const [rows] = await pool.query<RowDataPacket[]>(
+        'SELECT * FROM campsite_reviews WHERE id = ?',
+        [id]
+      );
+      if (rows.length > 0) {
+        return res.json(rows[0]);
+      }
+    }
+    
+    if (type === 'gear' || type === 'all') {
+      const [rows] = await pool.query<RowDataPacket[]>(
+        'SELECT * FROM gear_reviews WHERE id = ?',
+        [id]
+      );
+      if (rows.length > 0) {
+        return res.json(rows[0]);
+      }
+    }
+    
+    res.status(404).json({ message: 'Review not found' });
+  } catch (error) {
+    console.error('Get single review error:', error);
+    res.status(500).json({ message: 'Review getirilirken hata oluştu' });
+  }
+};
+
+export const create = async (req: Request, res: Response) => {
+  const { type } = req.body;
+  if (type === 'campsite') {
+    return createCampsiteReview(req, res);
+  } else if (type === 'gear') {
+    return createGearReview(req, res);
+  }
+  res.status(400).json({ message: 'Invalid review type' });
+};
+
+export const update = async (req: Request, res: Response) => {
+  // Update functionality - placeholder
+  res.status(501).json({ message: 'Update not implemented yet' });
+};
+
+export const remove = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const { type } = req.query;
+  
+  try {
+    const table = type === 'campsite' ? 'campsite_reviews' : 'gear_reviews';
+    await pool.query(`DELETE FROM ${table} WHERE id = ?`, [id]);
+    res.json({ message: 'Review deleted' });
+  } catch (error) {
+    console.error('Delete review error:', error);
+    res.status(500).json({ message: 'Review silinirken hata oluştu' });
+  }
+};
