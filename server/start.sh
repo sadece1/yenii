@@ -41,7 +41,8 @@ if ! kill -0 $NODE_PID 2>/dev/null; then
     tail -50 /app/logs/node.log || echo "No logs available"
     echo "📋 Process list:"
     ps aux || echo "ps command failed"
-    exit 1
+    echo "⚠️  Continuing with NGINX only - Node.js will not be available"
+    # Don't exit - let NGINX start anyway so we can see the container
 fi
 
 echo "✅ Node.js is running (PID: $NODE_PID)"
