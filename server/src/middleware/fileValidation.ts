@@ -237,8 +237,8 @@ export const validateUploadedFile = async (
             fileObj.filename,
             fileObj.originalname,
             fileHash,
-            file.size,
-            file.mimetype,
+            fileObj.size,
+            fileObj.mimetype,
             filePath
           );
           
@@ -288,8 +288,8 @@ export const validateUploadedFile = async (
             fileObj.filename,
             fileObj.originalname,
             fileHash,
-            file.size,
-            file.mimetype,
+            fileObj.size,
+            fileObj.mimetype,
             filePath
           );
         } catch (error) {
