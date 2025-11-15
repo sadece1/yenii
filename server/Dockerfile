@@ -66,7 +66,8 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=40s --retries=3 \
 
 # Start both NGINX and Node.js
 # NGINX in background, Node.js in foreground (logs visible)
-CMD ["/bin/sh", "-c", "mkdir -p /app/logs && echo 'Starting NGINX...' && nginx & sleep 2 && echo 'Starting Node.js...' && exec node dist/server.js"]
+# Use explicit error handling to see what's wrong
+CMD ["/bin/sh", "-c", "mkdir -p /app/logs && echo '=== CONTAINER STARTING ===' && echo 'Starting NGINX...' && nginx & sleep 2 && echo 'NGINX started' && echo 'Checking dist/server.js...' && ls -la dist/server.js && echo 'Starting Node.js...' && node dist/server.js 2>&1 || (echo '=== NODE.JS FAILED ===' && cat /app/logs/*.log 2>/dev/null || echo 'No log files found' && tail -f /dev/null)"]
 
 
 
