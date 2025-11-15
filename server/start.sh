@@ -23,7 +23,7 @@ sleep 2
 if ! kill -0 $NGINX_PID 2>/dev/null; then
     echo "ERROR: NGINX failed to start"
     # Keep container alive to see error
-    tail -f /dev/null
+    sleep infinity
     exit 1
 fi
 
@@ -35,7 +35,7 @@ if [ ! -f "/app/dist/server.js" ]; then
     echo "Files in dist:"
     ls -la /app/dist || echo "dist directory not found"
     # Keep container alive to see error
-    tail -f /dev/null
+    sleep infinity
     exit 1
 fi
 
