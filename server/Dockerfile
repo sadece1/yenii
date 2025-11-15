@@ -65,7 +65,8 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=40s --retries=3 \
   CMD wget --no-verbose --tries=1 --spider http://localhost/health || exit 1
 
 # Start both NGINX and Node.js
-CMD ["/app/start.sh"]
+# Use sh to ensure script runs even if there are issues
+CMD ["sh", "-c", "/app/start.sh || tail -100 /app/logs/node.log || echo 'Container failed to start'"]
 
 
 
