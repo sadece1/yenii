@@ -127,7 +127,7 @@ export const sanitizeImage = async (
   quality: number = 85
 ): Promise<{ success: boolean; error?: string }> => {
   try {
-    await sharp(inputPath)
+    await (sharp(inputPath) as any)
       .strip() // Remove EXIF and all metadata
       .toFormat(format, {
         quality,

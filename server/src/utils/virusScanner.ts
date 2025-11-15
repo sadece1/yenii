@@ -3,6 +3,7 @@ import { promisify } from 'util';
 import logger from './logger';
 import fs from 'fs';
 import path from 'path';
+import crypto from 'crypto';
 
 const execAsync = promisify(exec);
 

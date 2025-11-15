@@ -42,7 +42,8 @@ export const validateUploadedFile = async (
 
   try {
     for (const file of files) {
-      const filePath = path.join(process.cwd(), uploadConfig.uploadDir, file.filename);
+      const fileObj = file as Express.Multer.File;
+      const filePath = path.join(process.cwd(), uploadConfig.uploadDir, fileObj.filename);
 
       if (!fs.existsSync(filePath)) {
         logger.warn(`Uploaded file not found: ${filePath}`);
@@ -59,7 +60,7 @@ export const validateUploadedFile = async (
       fs.readSync(fd, buffer, 0, 12, 0);
       fs.closeSync(fd);
 
-      const ext = path.extname(file.filename).toLowerCase();
+      const ext = path.extname(fileObj.filename).toLowerCase();
       let isValid = false;
 
       switch (ext) {
@@ -80,13 +81,13 @@ export const validateUploadedFile = async (
 
       if (!isValid) {
         fs.unlinkSync(filePath);
-        logger.warn(`Invalid file signature detected: ${file.filename}`);
+        logger.warn(`Invalid file signature detected: ${fileObj.filename}`);
         securityLogger.logSecurityEvent(SecurityEventType.SUSPICIOUS_ACTIVITY, {
           userId: (req as any).user?.id,
           ip: (req as any).ip,
           details: {
             activity: 'Invalid file signature',
-            filename: file.filename,
+            filename: fileObj.filename,
           },
           severity: 'high',
         });
@@ -115,7 +116,7 @@ export const validateUploadedFile = async (
           ip: (req as any).ip,
           details: {
             activity: 'Polyglot file upload attempt',
-            filename: file.filename,
+            filename: fileObj.filename,
             detectedTypes: polyglotCheck.detectedTypes,
           },
           severity: 'critical',
@@ -183,18 +184,18 @@ export const validateUploadedFile = async (
             fs.renameSync(sanitizedPath, filePath);
             
             // Update filename if extension changed
-            if (!file.filename.endsWith('.jpg')) {
-              const newFilename = file.filename.replace(/\.[^.]+$/, '.jpg');
+            if (!fileObj.filename.endsWith('.jpg')) {
+              const newFilename = fileObj.filename.replace(/\.[^.]+$/, '.jpg');
               const newPath = path.join(process.cwd(), uploadConfig.uploadDir, newFilename);
               fs.renameSync(filePath, newPath);
-              file.filename = newFilename;
-              file.path = newPath;
+              fileObj.filename = newFilename;
+              fileObj.path = newPath;
             }
 
-            logger.info(`Image sanitized: ${file.filename}`);
+            logger.info(`Image sanitized: ${fileObj.filename}`);
           }
         } catch (sanitizeError) {
-          logger.warn(`Image sanitization failed: ${file.filename}`, sanitizeError);
+          logger.warn(`Image sanitization failed: ${fileObj.filename}`, sanitizeError);
           // Continue with original file
         }
       }
@@ -208,13 +209,13 @@ export const validateUploadedFile = async (
         fileHash = `hash-${Date.now()}-${Math.random()}`; // Fallback hash
       }
       // Store hash for later use
-      (file as any).hash = fileHash;
+      (fileObj as any).hash = fileHash;
 
       // 6. Check for duplicate files (skip if database error)
       try {
         const duplicateFile = await getUploadedFileByHash(fileHash);
         if (duplicateFile && !duplicateFile.isQuarantined) {
-          logger.info(`Duplicate file detected: ${file.filename} (matches ${duplicateFile.filename})`);
+          logger.info(`Duplicate file detected: ${fileObj.filename} (matches ${duplicateFile.filename})`);
           // Optionally delete the duplicate file to save space
           // For now, we'll keep it but could add duplicate detection logic
         }
@@ -225,7 +226,7 @@ export const validateUploadedFile = async (
 
       // 7. Virus scanning (if enabled, skip in development)
       const userId = (req as any).user?.id;
-      if (!isDevelopment && process.env.ENABLE_VIRUS_SCAN === 'true' && process.env.ENABLE_VIRUS_SCAN !== 'false') {
+      if (!isDevelopment && process.env.ENABLE_VIRUS_SCAN === 'true') {
         try {
           const virusScanResult = await scanFile(filePath);
         
@@ -233,8 +234,8 @@ export const validateUploadedFile = async (
           // Move to quarantine
           const fileRecord = await createUploadRecord(
             userId || 'system',
-            file.filename,
-            file.originalname,
+            fileObj.filename,
+            fileObj.originalname,
             fileHash,
             file.size,
             file.mimetype,
@@ -252,7 +253,7 @@ export const validateUploadedFile = async (
             ip: (req as any).ip,
             details: {
               activity: 'Virus detected in uploaded file',
-              filename: file.filename,
+              filename: fileObj.filename,
               threatName: virusScanResult.threatName,
             },
             severity: 'critical',
@@ -284,8 +285,8 @@ export const validateUploadedFile = async (
         try {
           await createUploadRecord(
             userId,
-            file.filename,
-            file.originalname,
+            fileObj.filename,
+            fileObj.originalname,
             fileHash,
             file.size,
             file.mimetype,
