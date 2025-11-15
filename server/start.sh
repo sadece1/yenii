@@ -43,11 +43,11 @@ if ! kill -0 $NODE_PID 2>/dev/null; then
     ps aux || echo "ps command failed"
     echo "⚠️  Continuing with NGINX only - Node.js will not be available"
     # Don't exit - let NGINX start anyway so we can see the container
+else
+    echo "✅ Node.js is running (PID: $NODE_PID)"
+    echo "📋 Checking if port 3000 is listening..."
+    netstat -tuln | grep 3000 || echo "⚠️  Port 3000 not yet listening"
 fi
-
-echo "✅ Node.js is running (PID: $NODE_PID)"
-echo "📋 Checking if port 3000 is listening..."
-netstat -tuln | grep 3000 || echo "⚠️  Port 3000 not yet listening"
 
 # Start NGINX in foreground (this will block)
 echo "🌐 Starting NGINX..."
