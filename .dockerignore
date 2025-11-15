@@ -1,0 +1,21 @@
+node_modules
+dist
+.git
+.env
+.env.local
+.env.production
+.env.*
+*.log
+.DS_Store
+coverage
+.vscode
+.idea
+*.md
+docs
+scripts
+test-system.js
+security-tests.js
+copy-image.js
+server
+Yeni klasör
+

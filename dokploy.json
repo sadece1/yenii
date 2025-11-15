@@ -1,0 +1,86 @@
+{
+  "name": "wecamp-frontend",
+  "type": "docker",
+  "description": "WeCamp Frontend - Kamp Alanı Pazar Yeri",
+  "docker": {
+    "dockerfile": "Dockerfile",
+    "buildContext": ".",
+    "buildArgs": {
+      "VITE_API_BASE_URL": "${VITE_API_BASE_URL}"
+    },
+    "ports": [
+      {
+        "container": 80,
+        "public": 80,
+        "protocol": "tcp"
+      }
+    ],
+    "volumes": [],
+    "healthcheck": {
+      "enabled": true,
+      "path": "/health",
+      "interval": 30,
+      "timeout": 3,
+      "retries": 3,
+      "startPeriod": 10
+    },
+    "restart": "unless-stopped",
+    "replicas": 1
+  },
+  "environment": {
+    "NODE_ENV": "production"
+  },
+  "secrets": [
+    {
+      "key": "VITE_API_BASE_URL",
+      "required": true,
+      "description": "Backend API Base URL (e.g., https://api.wecamp.com.tr/api)"
+    }
+  ],
+  "deployment": {
+    "strategy": "rolling",
+    "maxSurge": 1,
+    "maxUnavailable": 0
+  },
+  "resources": {
+    "limits": {
+      "cpu": "500m",
+      "memory": "256Mi"
+    },
+    "requests": {
+      "cpu": "100m",
+      "memory": "128Mi"
+    }
+  },
+  "scaling": {
+    "enabled": false,
+    "minReplicas": 1,
+    "maxReplicas": 3,
+    "targetCPU": 70,
+    "targetMemory": 80
+  },
+  "domains": [
+    {
+      "domain": "sadece1deneme.com",
+      "ssl": {
+        "enabled": true,
+        "provider": "letsencrypt",
+        "email": "admin@sadece1deneme.com"
+      }
+    },
+    {
+      "domain": "www.sadece1deneme.com",
+      "ssl": {
+        "enabled": true,
+        "provider": "letsencrypt",
+        "email": "admin@sadece1deneme.com"
+      }
+    }
+  ],
+  "monitoring": {
+    "enabled": true,
+    "metrics": true,
+    "logs": true
+  }
+}
+
