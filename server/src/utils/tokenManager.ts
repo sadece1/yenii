@@ -18,6 +18,7 @@ const BLACKLIST_CLEANUP_INTERVAL = 60 * 60 * 1000; // 1 hour
  */
 export const generateAccessToken = (payload: UserPayload): string => {
   const secret: string = jwtConfig.secret || '';
+  // @ts-ignore - jsonwebtoken type definitions issue
   return jwt.sign(
     { id: payload.id, email: payload.email, role: payload.role },
     secret,
@@ -34,6 +35,7 @@ export const generateAccessToken = (payload: UserPayload): string => {
  */
 export const generateRefreshToken = (userId: string): string => {
   const secret: string = jwtConfig.secret || '';
+  // @ts-ignore - jsonwebtoken type definitions issue
   const token = jwt.sign({ userId, type: 'refresh' }, secret, {
     expiresIn: '30d',
     issuer: jwtConfig.issuer,
