@@ -66,7 +66,7 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=40s --retries=3 \
 
 # Start both NGINX and Node.js using start script
 # Script has error handling and keeps container alive on errors
-CMD ["/app/start.sh"]
+CMD ["/bin/sh", "-c", "/app/start.sh"]
 
 
 
